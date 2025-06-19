@@ -33,4 +33,11 @@ public interface SetmealService {
      * @return
      */
     SetmealVO getWithDishesByid(Long id);
+
+    /**
+     * 启用禁用套餐
+     * @param status
+     * @param id
+     */
+    void startOrStop(Integer status, Long id);
 }

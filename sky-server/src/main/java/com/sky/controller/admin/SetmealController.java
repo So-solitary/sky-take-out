@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/admin/setmeal")
-@Api
+@Api(tags = "套餐相关接口")
 @Slf4j
 public class SetmealController {
 
@@ -50,9 +50,17 @@ public class SetmealController {
 
     @GetMapping("/{id}")
     @ApiOperation("根据id查询套餐")
-    public Result getWithDishesByid(Long id) {
+    public Result getWithDishesByid(@PathVariable Long id) {
         log.info("根据id查询套餐: {}", id);
         SetmealVO setmealVO = setmealService.getWithDishesByid(id);
         return Result.success(setmealVO);
+    }
+
+    @PostMapping("/status/{status}")
+    @ApiOperation("启用禁用套餐")
+    public Result startOrStop(@PathVariable Integer status, Long id) {
+        log.info("启用禁用套餐: 套餐ID {}, 状态 {}", id, status);
+        setmealService.startOrStop(status, id);
+        return Result.success();
     }
 }

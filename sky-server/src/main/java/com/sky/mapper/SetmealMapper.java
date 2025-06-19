@@ -26,8 +26,8 @@ public interface SetmealMapper {
      * 新增套餐
      * @param setmeal
      */
-    @Insert("insert into setmeal(name, image, price, category_id, description) values " +
-            "(#{name}, #{image}, #{price}, #{categoryId}, #{description})")
+    @Insert("insert into setmeal(name, image, price, category_id, description, status, create_time, create_user, update_time, update_user) values " +
+            "(#{name}, #{image}, #{price}, #{categoryId}, #{description}, #{status}, #{createTime}, #{createUser}, #{updateTime}, #{updateUser})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     @AutoFill(value = OperationType.INSERT)
     void save(Setmeal setmeal);
@@ -54,4 +54,11 @@ public interface SetmealMapper {
      */
     @Delete("delete from setmeal where id = #{id}")
     void deleteById(Long id);
+
+    /**
+     * 变更套餐
+      * @param setmeal
+     */
+    @AutoFill(OperationType.UPDATE)
+    void update(Setmeal setmeal);
 }

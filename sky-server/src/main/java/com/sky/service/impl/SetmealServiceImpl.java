@@ -116,4 +116,13 @@ public class SetmealServiceImpl implements SetmealService {
         setmealVO.setSetmealDishes(list);
         return setmealVO;
     }
+
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        Setmeal setmeal = Setmeal.builder()
+                .status(status)
+                .id(id)
+                .build();
+        setmealMapper.update(setmeal);
+    }
 }
