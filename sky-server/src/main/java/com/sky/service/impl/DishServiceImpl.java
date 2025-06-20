@@ -5,6 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.sky.constant.StatusConstant;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
+import com.sky.entity.Category;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
 import com.sky.entity.Setmeal;
@@ -133,6 +134,21 @@ public class DishServiceImpl implements DishService {
     @Override
     public List<DishVO> getByCategoryId(Long categoryId) {
         List<DishVO> list = dishMapper.getByCategoryId(categoryId);
+        return list;
+    }
+
+    /**
+     * 根据分类id查询菜品
+     * @param dish
+     * @return
+     */
+    @Override
+    public List<DishVO> listWithFlavors(Dish dish) {
+        List<DishVO> list = dishMapper.listWithFlavors(dish);
+        for (DishVO dishVO : list) {
+            List<DishFlavor> dishFlavorList = dishFlavorMapper.getByDishId(dishVO.getId());
+            dishVO.setFlavors(dishFlavorList);
+        }
         return list;
     }
 

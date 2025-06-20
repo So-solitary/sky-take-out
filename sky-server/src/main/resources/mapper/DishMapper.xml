@@ -39,5 +39,17 @@
             #{id}
         </foreach>
     </select>
+    <select id="listWithFlavors" resultType="com.sky.vo.DishVO" parameterType="com.sky.entity.Dish">
+        select
+            a.*,
+            c.name as categoryName
+        from dish a
+        left join category c on a.category_id = c.id
+        <where>
+            <if test="name != null">and a.name like concat('%',#{name},'%')</if>
+            <if test="categoryId != null">and a.category_id = #{categoryId}</if>
+            <if test="status != null">and a.status = #{status}</if>
+        </where>
+    </select>
 
 </mapper>

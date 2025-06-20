@@ -61,4 +61,10 @@ public interface SetmealMapper {
      */
     @AutoFill(OperationType.UPDATE)
     void update(Setmeal setmeal);
+
+    /**
+     * 批量删除套餐
+     * @param setmeal
+     */
+    List<SetmealVO> select(Setmeal setmeal);
 }
