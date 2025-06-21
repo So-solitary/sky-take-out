@@ -10,11 +10,15 @@ import com.sky.mapper.UserMapper;
 import com.sky.properties.WeChatProperties;
 import com.sky.service.UserService;
 import com.sky.utils.HttpClientUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
+@Service
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     //微信服务接口地址
@@ -65,9 +69,9 @@ public class UserServiceImpl implements UserService {
         map.put("secret", weChatProperties.getSecret());
         map.put("js_code", code);
         map.put("grant_type", "authorization_code");
-        HttpClientUtil.doGet(WX_LOGIN, map);
+        String json = HttpClientUtil.doGet(WX_LOGIN, map);
 
-        JSONObject jsonObject = JSON.parseObject("openid");
+        JSONObject jsonObject = JSON.parseObject(json);
         String openid = jsonObject.getString("openid");
         return openid;
 

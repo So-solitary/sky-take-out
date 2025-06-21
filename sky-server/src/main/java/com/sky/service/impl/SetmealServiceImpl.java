@@ -6,16 +6,19 @@ import com.sky.constant.StatusConstant;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.entity.Category;
+import com.sky.entity.Dish;
 import com.sky.entity.Setmeal;
 import com.sky.entity.SetmealDish;
 import com.sky.exception.SetmealEnableFailedException;
 import com.sky.exception.SetmealNeedUniqueException;
 import com.sky.mapper.CategoryMapper;
+import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.mapper.SetmealDishMapper;
 import com.sky.result.PageResult;
 import com.sky.service.SetmealService;
 import com.sky.vo.CategoryVO;
+import com.sky.vo.DishItemVO;
 import com.sky.vo.SetmealVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +26,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -36,6 +40,8 @@ public class SetmealServiceImpl implements SetmealService {
 
     @Autowired
     private SetmealDishMapper setmealDishMapper;
+    @Autowired
+    private DishMapper dishMapper;
 
     /**
      * 新增套餐
@@ -139,6 +145,24 @@ public class SetmealServiceImpl implements SetmealService {
                 .status(StatusConstant.ENABLE)
                 .build();
         List<SetmealVO> list = setmealMapper.select(setmeal);
+        return list;
+    }
+
+    /**
+     * 根据套餐id查询包含的菜品
+     * @param id
+     * @return
+     */
+    @Override
+    public List<DishItemVO> getBySetmealId(Long id) {
+        List<SetmealDish> setmealDishes = setmealDishMapper.getBySetmealId(id);
+        List<DishItemVO> list = new ArrayList<>();
+        for (SetmealDish setmealDish : setmealDishes) {
+            Dish dish = dishMapper.getById(setmealDish.getId().intValue());
+            DishItemVO dishItemVO = new DishItemVO();
+            BeanUtils.copyProperties(setmealDish, dishItemVO);
+            dishItemVO.setImage(dish.getImage());
+        }
         return list;
     }
 

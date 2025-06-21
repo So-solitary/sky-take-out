@@ -32,7 +32,7 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = new Category();
         BeanUtils.copyProperties(categoryDTO, category);
 
-        category.setStatus(StatusConstant.ENABLE);
+        category.setStatus(StatusConstant.DISABLE);
 
 //        category.setCreateTime(LocalDateTime.now());
 //        category.setUpdateTime(LocalDateTime.now());

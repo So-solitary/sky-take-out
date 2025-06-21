@@ -22,7 +22,7 @@ public interface UserMapper {
      * @param user
      */
     @Insert("insert into user (openid, name, phone, sex, id_number, avatar, create_time) " +
-            "values(#{openid}, #{name}, #{phone}, #{sex}, #{id_number}, #{avatar}, #{createTime})")
+            "values(#{openid}, #{name}, #{phone}, #{sex}, #{idNumber}, #{avatar}, #{createTime})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     void insert(User user);
 }

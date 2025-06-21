@@ -37,7 +37,6 @@ public interface CategoryMapper {
     @AutoFill(OperationType.UPDATE)
     void update(Category category);
 
-    @Select("select * from category where type = #{type}")
     List<CategoryVO> list(Integer type);
 
     /**
@@ -45,6 +44,5 @@ public interface CategoryMapper {
      * @param categoryId
      * @return
      */
-    @Select("select * from category where id = #{categoryId}")
     Category getById(Long categoryId);
 }

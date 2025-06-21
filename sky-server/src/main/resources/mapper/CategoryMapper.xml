@@ -27,4 +27,16 @@
         </where>
         order by sort
     </select>
+    <select id="getById" resultType="com.sky.entity.Category" parameterType="java.lang.Long">
+        select * from category
+        <where>
+            <if test="categoryId != null">category_id = #{categoryId}</if>
+        </where>
+    </select>
+    <select id="list" resultType="com.sky.vo.CategoryVO" parameterType="java.lang.Integer">
+        select * from category
+        <where>
+            <if test="type != null">type = #{type}</if>
+        </where>
+    </select>
 </mapper>

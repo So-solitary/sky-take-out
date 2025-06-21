@@ -152,4 +152,18 @@ public class DishServiceImpl implements DishService {
         return list;
     }
 
+    /**
+     * 启用禁用菜品
+     * @param dishId
+     * @param status
+     */
+    @Override
+    public void startOrStop(Long dishId, Integer status) {
+        Dish dish = Dish.builder()
+                .id(dishId)
+                .status(status)
+                .build();
+        dishMapper.update(dish);
+    }
+
 }
