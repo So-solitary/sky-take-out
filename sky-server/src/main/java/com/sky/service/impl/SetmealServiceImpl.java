@@ -166,5 +166,16 @@ public class SetmealServiceImpl implements SetmealService {
         return list;
     }
 
+    /**
+     * 修改套餐
+     * @param setmealDTO
+     */
+    @Override
+    public void update(SetmealDTO setmealDTO) {
+        Setmeal setmeal = new Setmeal();
+        BeanUtils.copyProperties(setmealDTO, setmeal);
+        setmealMapper.update(setmeal);
+    }
+
 
 }
