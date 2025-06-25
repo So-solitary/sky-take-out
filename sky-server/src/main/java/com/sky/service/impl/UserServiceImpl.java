@@ -2,6 +2,7 @@ package com.sky.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import com.sky.constant.MessageConstant;
 import com.sky.dto.UserLoginDTO;
 import com.sky.entity.User;
@@ -10,12 +11,15 @@ import com.sky.mapper.UserMapper;
 import com.sky.properties.WeChatProperties;
 import com.sky.service.UserService;
 import com.sky.utils.HttpClientUtil;
+import com.sky.vo.UserReportVO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -55,6 +59,40 @@ public class UserServiceImpl implements UserService {
         }
 
         return user;
+    }
+
+    @Override
+    public UserReportVO countByMap(LocalDate begin, LocalDate end) {
+        Map<LocalDate, Integer> map = new LinkedHashMap<>();
+        LocalDate _begin = begin;
+        while (!begin.equals(end)) {
+            map.put(_begin, 0);
+            _begin = _begin.plusDays(1);
+        }
+        Map<String, Object> params = new HashMap<>();
+        params.put("begin", begin);
+        params.put("end", end);
+        Map<LocalDate, Integer> addMap = userMapper.groupCount(params);
+        map.putAll(addMap);
+
+        List<Integer> newUserList = new ArrayList<>();
+        for (LocalDate localDate : map.keySet()) {
+            newUserList.add(map.get(localDate));
+            map.put(localDate, 0);
+        }
+
+        UserReportVO userReportVO = new UserReportVO();
+        userReportVO.setNewUserList(StringUtils.join(newUserList, ","));
+
+        Map<LocalDate, Integer> totalMap = userMapper.partitionCount(end);
+        map.putAll(totalMap);
+        List<Integer> totalUserList = new ArrayList<>();
+        for (LocalDate localDate : map.keySet()) {
+            totalUserList.add(map.get(localDate));
+        }
+        userReportVO.setTotalUserList(StringUtils.join(totalUserList, ","));
+        userReportVO.setDateList(StringUtils.join(map.keySet(), ","));
+        return userReportVO;
     }
 
     /**

@@ -1,10 +1,14 @@
 package com.sky.mapper;
 
 import com.sky.entity.User;
+import com.sky.vo.UserReportVO;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
+
+import java.time.LocalDate;
+import java.util.Map;
 
 @Mapper
 public interface UserMapper {
@@ -33,4 +37,19 @@ public interface UserMapper {
      */
     @Select("select * from user where id = #{userId}")
     User getById(Long userId);
+
+
+    /**
+     * 统计新增用户数量
+     * @param params
+     * @return
+     */
+    Map<LocalDate, Integer> groupCount(Map<String, Object> params);
+
+    /**
+     * 统计当前日期用户数量
+     * @param end
+     * @return
+     */
+    Map<LocalDate, Integer> partitionCount(LocalDate end);
 }
