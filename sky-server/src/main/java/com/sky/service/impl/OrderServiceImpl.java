@@ -21,7 +21,10 @@ import com.sky.service.OrderService;
 import com.sky.service.ShoppingCartService;
 import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.*;
+import com.sky.websocket.WebSocketServer;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +40,7 @@ import java.util.stream.Collectors;
 @Service
 public class OrderServiceImpl implements OrderService {
 
+    private static final Logger log = LoggerFactory.getLogger(OrderServiceImpl.class);
     @Autowired
     private AddressBookService addressBookMapper;
 
@@ -57,6 +61,9 @@ public class OrderServiceImpl implements OrderService {
     private WeChatPayUtil weChatPayUtil;
 
     private Orders orders;
+
+    @Autowired
+    private WebSocketServer webSocketServer;
     /**
      * 用户下单
      * @param ordersSubmitDTO
@@ -171,6 +178,13 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderMapper.update(orders);
+
+        Map<String, String> map = new HashMap<>();
+        map.put("type", "1");
+        map.put("orderId", orders.getId() + "");
+        map.put("content", "订单号: " + ordersDB.getNumber());
+
+        webSocketServer.sendToAllClient(JSONObject.toJSONString(map));
     }
 
     /**
@@ -390,28 +404,33 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public TurnoverReportVO turnoverStatistics(LocalDate begin, LocalDate end) {
-
-        Map<LocalDate, Integer> map = new LinkedHashMap<>();
+        Map<LocalDate, Integer> map = new LinkedHashMap<>(20);
         LocalDate _begin = begin;
-        while (!begin.equals(end)) {
+        while (!_begin.equals(end)) {
             map.put(_begin, 0);
             _begin = _begin.plusDays(1);
         }
 
         Map<String, Object> params = new HashMap<>();
-        params.put("begin", begin);
-        params.put("end", end);
+        params.put("beginTime", begin);
+        params.put("endTime", end);
         params.put("status", Orders.COMPLETED);
 
-        Map<LocalDate, Integer> resMap = orderMapper.countByMap( params);
+        List<GroupCountPOJO> resList = orderMapper.countByMap( params);
 
-        resMap.putAll(map);
+        for (GroupCountPOJO groupCountPOJO : resList) {
+            map.put(groupCountPOJO.getDate(), groupCountPOJO.getCount());
+        }
+//        for (LocalDate localDate : localDates) {
+//            //log.info("localDate: {}", localDate);
+//            map.put(localDate, resMap.get(localDate));
+//        }
 
         List<LocalDate> dateList = new ArrayList<>();
         List<Integer> turnoverList = new ArrayList<>();
         for (LocalDate localDate : map.keySet()) {
             dateList.add(localDate);
-            turnoverList.add(resMap.get(localDate));
+            turnoverList.add(map.get(localDate));
         }
         return TurnoverReportVO.builder()
                 .dateList(StringUtils.join(dateList,","))

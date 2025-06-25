@@ -4,22 +4,13 @@
 <mapper namespace="com.sky.mapper.UserMapper">
 
 
-    <select id="groupCount" resultType="java.util.Map">
-        select date(create_time),count(id) as count from users
+    <select id="groupCount" resultType="com.sky.pojo.GroupCountPOJO">
+        select date(create_time),count(id) as count from user
         <where>
             <if test="beginTime != null">and create_time &gt;= #{beginTime}</if>
             <if test="endTime != null">and create_time &lt;= #{endTime}</if>
         </where>
         group by date(create_time)
     </select>
-    <select id="partitionCount" resultType="java.util.Map" parameterType="java.time.LocalDate">
-        select
-            date(create_time) as date,
-            count(id) over(order by date(create_time) desc) as cnt
-        from users
-        <where>
-            <if test="beginTime != null">and create_time &gt;= #{beginTime}</if>
-            <if test="endTime != null">and create_time &lt;= #{endTime}</if>
-        </where>
-    </select>
+
 </mapper>

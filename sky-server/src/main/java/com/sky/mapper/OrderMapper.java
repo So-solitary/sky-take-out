@@ -73,10 +73,15 @@ public interface OrderMapper {
      */
     Page<OrdersVO> pcPageQuery(OrdersPageQueryDTO ordersPageQueryDTO);
 
+
     /**
-     * 根据状态和order_time统计订单数量
-     * @param params
-     * @return
+     * 根据状态和下单时间查询订单
+     * @param status
+     * @param orderTime
      */
-    Map<LocalDate, Integer> countByMap(Map<String, Object> params);
+    @Select("select * from orders where status = #{status} and order_time < #{orderTime}")
+    List<Orders> getByStatusAndOrdertimeLT(Integer status, LocalDateTime orderTime);
+
+
+    List<GroupCountPOJO> countByMap(Map<String, Object> params);
 }

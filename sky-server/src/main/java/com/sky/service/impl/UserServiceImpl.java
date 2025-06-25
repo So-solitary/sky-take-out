@@ -8,6 +8,7 @@ import com.sky.dto.UserLoginDTO;
 import com.sky.entity.User;
 import com.sky.exception.LoginFailedException;
 import com.sky.mapper.UserMapper;
+import com.sky.pojo.GroupCountPOJO;
 import com.sky.properties.WeChatProperties;
 import com.sky.service.UserService;
 import com.sky.utils.HttpClientUtil;
@@ -65,34 +66,35 @@ public class UserServiceImpl implements UserService {
     public UserReportVO countByMap(LocalDate begin, LocalDate end) {
         Map<LocalDate, Integer> map = new LinkedHashMap<>();
         LocalDate _begin = begin;
-        while (!begin.equals(end)) {
+        while (!_begin.equals(end)) {
             map.put(_begin, 0);
             _begin = _begin.plusDays(1);
         }
         Map<String, Object> params = new HashMap<>();
-        params.put("begin", begin);
-        params.put("end", end);
-        Map<LocalDate, Integer> addMap = userMapper.groupCount(params);
-        map.putAll(addMap);
-
-        List<Integer> newUserList = new ArrayList<>();
-        for (LocalDate localDate : map.keySet()) {
-            newUserList.add(map.get(localDate));
-            map.put(localDate, 0);
+        params.put("beginTime", begin);
+        params.put("endTime", end);
+        List<GroupCountPOJO> addList = userMapper.groupCount(params);
+        for (GroupCountPOJO groupCountPOJO : addList) {
+            map.put(groupCountPOJO.getDate(), groupCountPOJO.getCount());
         }
 
-        UserReportVO userReportVO = new UserReportVO();
-        userReportVO.setNewUserList(StringUtils.join(newUserList, ","));
-
-        Map<LocalDate, Integer> totalMap = userMapper.partitionCount(end);
-        map.putAll(totalMap);
+        List<LocalDate> dateList = new ArrayList<>();
+        List<Integer> addUserList = new ArrayList<>();
         List<Integer> totalUserList = new ArrayList<>();
+        Integer totalUserNum = 0;
         for (LocalDate localDate : map.keySet()) {
-            totalUserList.add(map.get(localDate));
+            dateList.add(localDate);
+            addUserList.add(map.get(localDate));
+            totalUserNum += map.get(localDate);
+            totalUserList.add(totalUserNum);
         }
-        userReportVO.setTotalUserList(StringUtils.join(totalUserList, ","));
-        userReportVO.setDateList(StringUtils.join(map.keySet(), ","));
-        return userReportVO;
+
+
+        return UserReportVO.builder()
+                .dateList(StringUtils.join(dateList, ","))
+                .newUserList(StringUtils.join(addUserList, ","))
+                .totalUserList(StringUtils.join(totalUserList, ","))
+                .build();
     }
 
     /**
