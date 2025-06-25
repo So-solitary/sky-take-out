@@ -14,12 +14,14 @@ import com.sky.exception.OrderBusinessException;
 import com.sky.mapper.OrderDetailMapper;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
+import com.sky.pojo.GroupCountPOJO;
 import com.sky.result.PageResult;
 import com.sky.service.AddressBookService;
 import com.sky.service.OrderService;
 import com.sky.service.ShoppingCartService;
 import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.*;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,10 +31,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -380,6 +380,43 @@ public class OrderServiceImpl implements OrderService {
                 .status(Orders.COMPLETED)
                 .build();
         orderMapper.update(order);
+    }
+
+    /**
+     * 营业额统计
+     * @param begin
+     * @param end
+     * @return
+     */
+    @Override
+    public TurnoverReportVO turnoverStatistics(LocalDate begin, LocalDate end) {
+
+        Map<LocalDate, Integer> map = new LinkedHashMap<>();
+        LocalDate _begin = begin;
+        while (!begin.equals(end)) {
+            map.put(_begin, 0);
+            _begin = _begin.plusDays(1);
+        }
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("begin", begin);
+        params.put("end", end);
+        params.put("status", Orders.COMPLETED);
+
+        Map<LocalDate, Integer> resMap = orderMapper.countByMap( params);
+
+        resMap.putAll(map);
+
+        List<LocalDate> dateList = new ArrayList<>();
+        List<Integer> turnoverList = new ArrayList<>();
+        for (LocalDate localDate : map.keySet()) {
+            dateList.add(localDate);
+            turnoverList.add(resMap.get(localDate));
+        }
+        return TurnoverReportVO.builder()
+                .dateList(StringUtils.join(dateList,","))
+                .turnoverList(StringUtils.join(turnoverList,","))
+                .build();
     }
 
     private List<OrderVO> getOrderVOList(Page<OrdersVO> page) {

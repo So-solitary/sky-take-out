@@ -3,10 +3,14 @@ package com.sky.mapper;
 import com.github.pagehelper.Page;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
+import com.sky.pojo.GroupCountPOJO;
 import com.sky.vo.OrdersVO;
 import org.apache.ibatis.annotations.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface OrderMapper {
@@ -68,4 +72,11 @@ public interface OrderMapper {
      * @return
      */
     Page<OrdersVO> pcPageQuery(OrdersPageQueryDTO ordersPageQueryDTO);
+
+    /**
+     * 根据状态和order_time统计订单数量
+     * @param params
+     * @return
+     */
+    Map<LocalDate, Integer> countByMap(Map<String, Object> params);
 }

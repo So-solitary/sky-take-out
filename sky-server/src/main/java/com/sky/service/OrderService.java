@@ -2,11 +2,9 @@ package com.sky.service;
 
 import com.sky.dto.*;
 import com.sky.result.PageResult;
-import com.sky.vo.OrderPaymentVO;
-import com.sky.vo.OrderStatisticsVO;
-import com.sky.vo.OrderSubmitVO;
-import com.sky.vo.OrderVO;
+import com.sky.vo.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public interface OrderService {
@@ -100,4 +98,12 @@ public interface OrderService {
      * @param id
      */
     void complete(Long id);
+
+    /**
+     * 营业额统计
+     * @param begin
+     * @param end
+     * @return
+     */
+    TurnoverReportVO turnoverStatistics(LocalDate begin, LocalDate end);
 }
